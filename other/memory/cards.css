@@ -1,0 +1,42 @@
+[data-color="aquamarijn"] {
+    --color: var(--aquamarijn);
+}
+[data-color="dolomiet"] {
+    --color: var(--dolomiet);
+}
+[data-color="gember"] {
+    --color: var(--gember);
+}
+[data-color="hemel"] {
+    --color: var(--hemel);
+}
+[data-color="india"] {
+    --color: var(--india);
+}
+[data-color="magnolia"] {
+    --color: var(--magnolia);
+}
+[data-color="marine"] {
+    --color: var(--marine);
+}
+[data-color="middernacht"] {
+    --color: var(--middernacht);
+}
+[data-color="mosterd"] {
+    --color: var(--mosterd);
+}
+[data-color="noordzee"] {
+    --color: var(--noordzee);
+}
+[data-color="olijf"] {
+    --color: var(--olijf);
+}
+[data-color="switch"] {
+    --color: var(--switch);
+}
+[data-color="taling"] {
+    --color: var(--taling);
+}
+[data-color="zalm"] {
+    --color: var(--zalm);
+}

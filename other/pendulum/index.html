@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Stijn's Double Pendulum</title>
+        <link rel="stylesheet" href="style.css" />
+    </head>
+
+    <body>
+        <div id="settings">
+            <div class="setting">
+                <label for="r1">Radius 1:</label>
+                <input type="range" id="r1" min="100" max="300" />
+                <span id="r1val"></span>
+            </div>
+            <div class="setting">
+                <label for="m1">Mass 1:</label>
+                <input type="range" id="m1" min="20" max="150" />
+                <span id="m1val"></span>
+            </div>
+            <div class="setting">
+                <label for="r2">Radius 2:</label>
+                <input type="range" id="r2" min="100" max="300" />
+                <span id="r2val"></span>
+            </div>
+            <div class="setting">
+                <label for="m2">Mass 2:</label>
+                <input type="range" id="m2" min="20" max="150" />
+                <span id="m2val"></span>
+            </div>
+        </div>
+        <canvas id="board"></canvas>
+        <script src="script.js"></script>
+    </body>
+</html>

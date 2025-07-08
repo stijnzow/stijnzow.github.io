@@ -1,0 +1,184 @@
+:root {
+    --bg-fail: var(--basalt-2);
+    --bg-default: var(--basalt-1);
+    --fg-default: var(--basalt-11);
+    --btn-light: var(--olijf-m);
+    --btn-dark: var(--switch-m);
+    --accent: var(--hemel);
+}
+
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--bg-default);
+    color: var(--fg-default);
+    font-family: sans-serif;
+    font-size: 1.5rem;
+    padding-top: 1.5rem;
+}
+
+h1,
+h2 {
+    text-align: center;
+}
+
+#tagline {
+    text-align: center;
+    font-size: 1rem;
+    color: var(--fg-default);
+    /* background-color: green; */
+    padding: 6px;
+}
+
+.button {
+    background: linear-gradient(var(--btn-dark), var(--btn-light));
+    border-radius: 6px;
+    color: var(--fg-default);
+    cursor: pointer;
+    display: inline-block;
+    font-size: 1em;
+    font-weight: bold;
+    padding: 1em 2em;
+    text-decoration: none;
+
+    &:hover {
+        background: linear-gradient(var(--btn-light), var(--btn-dark));
+    }
+}
+
+.wrapper {
+    width: 80vw;
+    margin-left: 10vw;
+    margin-right: 10vw;
+    margin-bottom: 3em;
+}
+
+.header {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    gap: 1em;
+    align-items: center;
+}
+
+#cartoons {
+    display: grid;
+    grid-template-areas:
+        "offthemark garfield"
+        "offthemark wizardofid"
+        "offthemark andycapp";
+    grid-template-columns: 1fr 2fr;
+    gap: 1em;
+    margin: 1em 0;
+
+    &.sunday {
+        grid-template-areas:
+            "offthemark"
+            "garfield"
+            "wizardofid"
+            "andycapp";
+        grid-template-columns: 1fr;
+        margin: 1em 5em;
+    }
+}
+
+#offthemark {
+    grid-area: offthemark;
+}
+
+#garfield {
+    grid-area: garfield;
+}
+
+#wizardofid {
+    grid-area: wizardofid;
+}
+
+#andycapp {
+    grid-area: andycapp;
+}
+
+.card {
+    --body-height: 275px;
+
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+    gap: 1em;
+
+    .card-body {
+        min-height: var(--body-height);
+    }
+
+    .spinner {
+        display: none;
+    }
+
+    .image {
+        display: none;
+        min-width: 100%;
+        max-width: 100%;
+        object-fit: contain;
+    }
+
+    .not-found {
+        display: none;
+        text-align: center;
+        font-size: 2.5em;
+        font-family: cursive;
+    }
+
+    &[data-state="loading"] {
+        .card-body {
+            display: grid;
+            justify-items: center; /* center hori */
+            align-items: center; /* center vert */
+
+            .spinner {
+                display: inline;
+            }
+        }
+    }
+
+    &[data-state="not-found"] {
+        .card-body {
+            display: grid;
+            justify-items: center;
+            align-content: center;
+            background-color: var(--bg-fail);
+
+            .not-found {
+                display: block;
+            }
+        }
+    }
+
+    &[data-state="found"] {
+        .image {
+            display: block;
+        }
+    }
+}
+
+.spinner {
+    height: 5em;
+    aspect-ratio: 1;
+    border: 0.75em solid var(--accent);
+    border-bottom-color: transparent;
+    border-radius: 50%;
+    display: inline-block;
+    animation: spinnerAnimation 1s linear infinite;
+}
+
+@keyframes spinnerAnimation {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}

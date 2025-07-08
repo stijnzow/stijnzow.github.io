@@ -1,0 +1,61 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Stijn's Emoji</title>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Kalam"
+            rel="stylesheet"
+        />
+        <style type="text/css">
+            body {
+                font-family: Kalam, cursive;
+                font-size: 3rem;
+            }
+            #emoji {
+                font-size: calc(min(100vh, 35vw));
+            }
+            dt {
+                /* border-top: 1px solid blue; */
+                text-decoration: underline;
+            }
+        </style>
+    </head>
+    <body>
+        <h1 style="text-align: center">Emoji</h1>
+        <div style="display: flex; justify-content: center; gap: 2rem">
+            <div id="emoji"></div>
+            <div>
+                <dl>
+                    <dt>Category:</dt>
+                    <dd id="category"></dd>
+                    <dt>Group:</dt>
+                    <dd id="group"></dd>
+                    <dt>Name:</dt>
+                    <dd id="name"></dd>
+                    <dt>HTML code:</dt>
+                    <dd id="code-html"></dd>
+                    <dt>Unicode:</dt>
+                    <dd id="code-utf"></dd>
+                </dl>
+            </div>
+        </div>
+    </body>
+    <script type="text/javascript">
+        window.onload = async function () {
+            let r = await fetch("https://emojihub.yurace.pro/api/random");
+            let emoji = JSON.parse(await r.text());
+            console.log(emoji);
+            document.getElementById("category").innerText = emoji["category"];
+            document.getElementById("group").innerText = emoji["group"];
+            document.getElementById("name").innerText = emoji["name"];
+            document.getElementById("emoji").innerHTML =
+                emoji["htmlCode"].join("");
+            document.getElementById("code-html").innerText =
+                emoji["htmlCode"].join("");
+            document.getElementById("code-utf").innerText =
+                emoji["unicode"].join(", ");
+        };
+    </script>
+</html>

@@ -1,0 +1,47 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <title>Stijn's homepage</title>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Kalam"
+            rel="stylesheet"
+        />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.1/css/bulma.min.css"
+        />
+        <style type="text/css">
+            #joke {
+                font-family: Kalam, cursive;
+            }
+        </style>
+    </head>
+    <body class="has-background-black-ter">
+        <section class="hero is-fullheight">
+            <div class="hero-body is-justify-content-center">
+                <div id="joke" class="container is-size-1 has-text-centered">
+                    <hr class="has-background-grey-darker" />
+                    <div class="mb-6 mt-6">
+                        <div class="has-text-primary">Setup:</div>
+                        <div id="joke-setup" class="has-text-info"></div>
+                    </div>
+                    <div class="mb-6">
+                        <div class="has-text-primary">Delivery:</div>
+                        <div id="joke-delivery" class="has-text-info"></div>
+                    </div>
+                    <hr class="has-background-grey-darker" />
+                </div>
+            </div>
+        </section>
+    </body>
+    <script type="text/javascript">
+        window.onload = async function () {
+            let r = await fetch("https://v2.jokeapi.dev/joke/Programming,Miscellaneous,Pun?type=twopart");
+            let joke = JSON.parse(await r.text());
+            document.getElementById("joke-setup").innerText = joke.setup;
+            document.getElementById("joke-delivery").innerText = joke.delivery;
+        };
+    </script>
+</html>
