@@ -103,7 +103,7 @@ async function updateCard(name, dt) {
 }
 
 async function updatePage(dt) {
-  title.innerText = `Cartoons van ${dt.asSignature()}`;
+  title.innerText = `Cartoons on ${dt.asSignature()}`;
   dateSig.innerText = dt.asSignature();
   cartoons.classList.toggle("sunday", dt.isSunday());
   btnPrev.setAttribute("href", dt.yesterday().asUrlHash());
