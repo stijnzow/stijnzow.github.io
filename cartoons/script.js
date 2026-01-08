@@ -109,7 +109,7 @@ async function updatePage(dt) {
   btnPrev.setAttribute("href", dt.yesterday().asUrlHash());
   btnNext.setAttribute("href", dt.tomorrow().asUrlHash());
 
-  let names = ["offthemark", "garfield", "wizardofid", "andycapp"];
+  let names = ["offthemark", "garfield", "wizardofid", "andycapp", "glasbergen-cartoons"];
   names.forEach((name) => updateCard(name, dt));
 }
 

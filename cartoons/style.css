@@ -35,7 +35,7 @@ h2 {
 }
 
 .button {
-    background: linear-gradient(var(--btn-dark), var(--btn-light));
+    background-image: linear-gradient(var(--btn-dark), var(--btn-light));
     border-radius: 6px;
     color: var(--fg-default);
     cursor: pointer;
@@ -46,7 +46,7 @@ h2 {
     text-decoration: none;
 
     &:hover {
-        background: linear-gradient(var(--btn-light), var(--btn-dark));
+        background-image: linear-gradient(var(--btn-light), var(--btn-dark));
     }
 }
 
@@ -70,7 +70,7 @@ h2 {
     grid-template-areas:
         "offthemark garfield"
         "offthemark wizardofid"
-        "offthemark andycapp";
+        "glasbergen-cartoons andycapp";
     grid-template-columns: 1fr 2fr;
     gap: 1em;
     margin: 1em 0;
@@ -80,7 +80,8 @@ h2 {
             "offthemark"
             "garfield"
             "wizardofid"
-            "andycapp";
+            "andycapp"
+            "glasbergen-cartoons";
         grid-template-columns: 1fr;
         margin: 1em 5em;
     }
@@ -100,6 +101,10 @@ h2 {
 
 #andycapp {
     grid-area: andycapp;
+}
+
+#glasbergen-cartoons {
+    grid-area: glasbergen-cartoons;
 }
 
 .card {
@@ -135,8 +140,8 @@ h2 {
     &[data-state="loading"] {
         .card-body {
             display: grid;
-            justify-items: center; /* center hori */
-            align-items: center; /* center vert */
+            justify-items: center;
+            align-items: center;
 
             .spinner {
                 display: inline;
@@ -178,6 +183,7 @@ h2 {
     0% {
         transform: rotate(0deg);
     }
+
     100% {
         transform: rotate(360deg);
     }
