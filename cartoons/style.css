@@ -55,6 +55,8 @@ h2 {
     margin-left: 10vw;
     margin-right: 10vw;
     margin-bottom: 3em;
+    display: flex;
+    flex-direction: column;
 }
 
 .header {
@@ -66,24 +68,32 @@ h2 {
 }
 
 #cartoons {
-    display: grid;
-    grid-template-areas:
-        "offthemark garfield"
-        "offthemark wizardofid"
-        "glasbergen-cartoons andycapp";
-    grid-template-columns: 1fr 2fr;
     gap: 1em;
     margin: 1em 0;
+    display: flex;
+    flex-direction: column;
+
+    .column {
+        display: flex;
+        flex-direction: column;
+        gap: 1em;
+    }
+
+    .column-side {
+        flex-direction: row;
+    }
 
     &.sunday {
-        grid-template-areas:
-            "offthemark"
-            "garfield"
-            "wizardofid"
-            "andycapp"
-            "glasbergen-cartoons";
-        grid-template-columns: 1fr;
-        margin: 1em 5em;
+        flex-direction: row;
+
+        .column-main {
+            flex: 4;
+        }
+
+        .column-side {
+            flex: 3;
+            flex-direction: column;
+        }
     }
 }
 
@@ -110,6 +120,7 @@ h2 {
 .card {
     --body-height: 275px;
 
+    padding-top: .5rem;
     display: flex;
     flex-direction: column;
     align-content: center;
