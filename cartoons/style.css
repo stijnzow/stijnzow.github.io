@@ -70,30 +70,16 @@ h2 {
 #cartoons {
     gap: 1em;
     margin: 1em 0;
-    display: flex;
-    flex-direction: column;
-
-    .column {
-        display: flex;
-        flex-direction: column;
-        gap: 1em;
-    }
-
-    .column-side {
-        flex-direction: row;
-    }
+    display: grid;
+    grid-template-areas:
+        "garfield   garfield"
+        "wizardofid wizardofid"
+        "andycapp   andycapp"
+        "offthemark glasbergen";
+    grid-template-columns: 1fr 1fr;
 
     &.sunday {
-        flex-direction: row;
-
-        .column-main {
-            flex: 4;
-        }
-
-        .column-side {
-            flex: 3;
-            flex-direction: column;
-        }
+        grid-template-columns: 3fr 2fr;
     }
 }
 
@@ -114,7 +100,7 @@ h2 {
 }
 
 #glasbergen-cartoons {
-    grid-area: glasbergen-cartoons;
+    grid-area: glasbergen;
 }
 
 .card {
