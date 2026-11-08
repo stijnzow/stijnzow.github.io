@@ -5,6 +5,7 @@
     --btn-light: var(--olijf-m);
     --btn-dark: var(--switch-m);
     --accent: var(--hemel);
+    --gap: 1em;
 }
 
 * {
@@ -18,170 +19,96 @@ body {
     color: var(--fg-default);
     font-family: sans-serif;
     font-size: 1.5rem;
-    padding-top: 1.5rem;
+    padding-top: var(--gap);
 }
 
-h1,
-h2 {
-    text-align: center;
-}
-
-#tagline {
-    text-align: center;
-    font-size: 1rem;
-    color: var(--fg-default);
-    /* background-color: green; */
-    padding: 6px;
-}
-
-.button {
-    background-image: linear-gradient(var(--btn-dark), var(--btn-light));
-    border-radius: 6px;
-    color: var(--fg-default);
+button {
     cursor: pointer;
-    display: inline-block;
+    padding: calc(var(--gap) / 2) var(--gap);
+    border: none;
+    border-radius: 5px;
+    background-color: var(--btn-dark);
+    color: var(--fg-default);
     font-size: 1em;
-    font-weight: bold;
-    padding: 1em 2em;
     text-decoration: none;
 
+    &:disabled {
+        cursor: default;
+        background-color: inherit;
+
+        &:hover {
+            background-color: inherit;
+        }
+    }
+
     &:hover {
-        background-image: linear-gradient(var(--btn-light), var(--btn-dark));
+        background-color: var(--btn-light);
     }
 }
 
-.wrapper {
-    width: 80vw;
+header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--gap);
+    margin: var(--gap);
+}
+
+main {
+    display: flex;
+    gap: var(--gap);
+
+    max-width: 80vw;
     margin-left: 10vw;
     margin-right: 10vw;
     margin-bottom: 3em;
-    display: flex;
-    flex-direction: column;
-}
-
-.header {
-    display: flex;
-    width: 100%;
-    justify-content: space-between;
-    gap: 1em;
-    align-items: center;
-}
-
-#cartoons {
-    gap: 1em;
-    margin: 1em 0;
-    display: grid;
-    grid-template-areas:
-        "garfield   garfield"
-        "wizardofid wizardofid"
-        "andycapp   andycapp"
-        "offthemark glasbergen";
-    grid-template-columns: 1fr 1fr;
 
     &.sunday {
-        grid-template-columns: 3fr 2fr;
+        flex-direction: column;
+
+        .right {
+            display: flex;
+            flex-direction: row;
+            gap: var(--gap);
+        }
     }
-}
 
-#offthemark {
-    grid-area: offthemark;
-}
+    .column {
+        display: flex;
+        flex-direction: column;
+        gap: var(--gap);
+        min-height: 0;
+        padding: .5em;
 
-#garfield {
-    grid-area: garfield;
-}
+        &.left {
+            flex: 2;
+        }
 
-#wizardofid {
-    grid-area: wizardofid;
-}
-
-#andycapp {
-    grid-area: andycapp;
-}
-
-#glasbergen-cartoons {
-    grid-area: glasbergen;
+        &.right {
+            flex: 1;
+        }
+    }
 }
 
 .card {
     --body-height: 275px;
 
-    padding-top: .5rem;
     display: flex;
     flex-direction: column;
     align-content: center;
     gap: 1em;
 
+    .card-header {
+        text-align: center;
+    }
+
     .card-body {
         min-height: var(--body-height);
-    }
 
-    .spinner {
-        display: none;
-    }
-
-    .image {
-        display: none;
-        min-width: 100%;
-        max-width: 100%;
-        object-fit: contain;
-    }
-
-    .not-found {
-        display: none;
-        text-align: center;
-        font-size: 2.5em;
-        font-family: cursive;
-    }
-
-    &[data-state="loading"] {
-        .card-body {
-            display: grid;
-            justify-items: center;
-            align-items: center;
-
-            .spinner {
-                display: inline;
-            }
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
         }
-    }
-
-    &[data-state="not-found"] {
-        .card-body {
-            display: grid;
-            justify-items: center;
-            align-content: center;
-            background-color: var(--bg-fail);
-
-            .not-found {
-                display: block;
-            }
-        }
-    }
-
-    &[data-state="found"] {
-        .image {
-            display: block;
-        }
-    }
-}
-
-.spinner {
-    height: 5em;
-    aspect-ratio: 1;
-    border: 0.75em solid var(--accent);
-    border-bottom-color: transparent;
-    border-radius: 50%;
-    display: inline-block;
-    animation: spinnerAnimation 1s linear infinite;
-}
-
-@keyframes spinnerAnimation {
-    0% {
-        transform: rotate(0deg);
-    }
-
-    100% {
-        transform: rotate(360deg);
     }
 }

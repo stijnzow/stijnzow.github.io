@@ -1,156 +1,152 @@
-let btnPrev = document.querySelector("#prev");
-let btnNext = document.querySelector("#next");
-let cartoons = document.querySelector("#cartoons");
-let title = document.querySelector("title");
-let dateSig = document.querySelector("#date_sig");
+const parser = new DOMParser();
+let firstPubdate = null;
+let lastPubdate = null;
 
-// region Prototyping
+let library = new Map();
+let currentPubdate = new Date();
 
-Date.prototype.isSunday = function () {
-  return this.getDay() == 0;
+// #region Prototyping
+
+Date.prototype.prev = function () {
+    let dt = new Date(this.getTime());
+    dt.setDate(this.getDate() - 1);
+    return dt;
 };
 
-Date.prototype.yesterday = function () {
-  let dt = new Date(this.getTime());
-  dt.setDate(this.getDate() - 1);
-  return dt;
+Date.prototype.next = function () {
+    let dt = new Date(this.getTime());
+    dt.setDate(this.getDate() + 1);
+    return dt;
 };
 
-Date.prototype.tomorrow = function () {
-  let dt = new Date(this.getTime());
-  dt.setDate(this.getDate() + 1);
-  return dt;
+Date.prototype.key = function () {
+    let y = this.getFullYear();
+    let m = String(this.getMonth() + 1).padStart(2, "0");
+    let d = String(this.getDate()).padStart(2, "0");
+    return `${y}-${m}-${d}`;
 };
 
-Date.prototype.asUrlPath = function () {
-  let y = this.getFullYear();
-  let m = String(this.getMonth() + 1).padStart(2, "0");
-  let d = String(this.getDate()).padStart(2, "0");
-  return `${y}/${m}/${d}`;
+Date.prototype.display = function () {
+    return this.toLocaleDateString("nl-BE", {
+        weekday: "short",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+    });
 };
 
-Date.prototype.asUrlHash = function () {
-  let y = this.getFullYear();
-  let m = this.getMonth() + 1;
-  let d = this.getDate();
-  return `#${y}-${m}-${d}`;
-};
+// #endregion Prototyping
 
-Date.prototype.asSignature = function () {
-  return this.toLocaleDateString("nl-BE", {
-    weekday: "short",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-};
-
-Date.prototype.asPublished = function () {
-  return this.toLocaleDateString("en-US", {
-    month: "long",
-    year: "numeric",
-    day: "numeric",
-  });
-};
-
-// endregion Prototyping
-
-function randBetween(lo, hi) {
-  let [randomInt] = crypto.getRandomValues(new Uint32Array(1));
-  let UINT32_MAX = 4294967295;
-  let factor = randomInt / (UINT32_MAX + 1);
-  return lo + Math.round(factor * (hi - lo));
-}
-
-async function parseGoComics(name, dt) {
-  let url = "https://www.gocomics.com/" + name + "/" + dt.asUrlPath();
-  let r = await fetch(url, { signal: AbortSignal.timeout(5000) }).catch(() => {
-    return "";
-  });
-  if (!r.ok) {
-    return "";
-  }
-  let parser = new DOMParser();
-  let doc = parser.parseFromString(await r.text(), "text/html");
-  let comic_url = "";
-  doc.querySelectorAll("script[type='application/ld+json']").forEach((el) => {
-    let meta = JSON.parse(el.text);
-    if (meta.datePublished === dt.asPublished()) {
-      comic_url = meta.url;
+function addToLibrary(img_date, comic_id, img_hash) {
+    if (!library.has(img_date)) {
+        library.set(img_date, new Map());
     }
-  });
-  return comic_url;
+    let pubdate = new Date(img_date);
+    firstPubdate = (firstPubdate == null ? pubdate : (pubdate < firstPubdate) ? pubdate : firstPubdate);
+    lastPubdate = (lastPubdate == null ? pubdate : (lastPubdate < pubdate) ? pubdate : lastPubdate);
+    library.get(img_date).set(comic_id, img_hash);
 }
 
-async function updateCard(name, dt) {
-  let card = document.querySelector(`#${name}`);
-  card.dataset.state = "loading";
-  let img = card.querySelector(`.image`);
-  img.src = "";
-  let url = await parseGoComics(name, dt).catch((error) => {
-    console.error(error);
-    card.dataset.state = "not-found";
-    return;
-  });
-  if (!!url) {
-    img.onload = () => {
-      card.dataset.state = "found";
-    };
-    img.src = url;
-  } else {
-    card.dataset.state = "not-found";
-  }
+function parseItem(comic_id, item) {
+    let title = String(item.querySelector("title").textContent);
+    let img_date = title.substring(title.length - 10, title.length);
+    let description = String(item.querySelector("description").textContent);
+    let re_groups = /assets\/([0-9a-f]+)/.exec(description);
+    let img_hash = re_groups[1];
+    addToLibrary(img_date, comic_id, img_hash);
 }
 
-async function updatePage(dt) {
-  title.innerText = `Cartoons on ${dt.asSignature()}`;
-  dateSig.innerText = dt.asSignature();
-  cartoons.classList.toggle("sunday", dt.isSunday());
-  btnPrev.setAttribute("href", dt.yesterday().asUrlHash());
-  btnNext.setAttribute("href", dt.tomorrow().asUrlHash());
+async function parseComic(comic_id) {
+    let feed_url = `https://comiccaster.xyz/rss/${comic_id}`;
+    let xml = await (await fetch(feed_url)).text();
+    let doc = parser.parseFromString(xml, "text/xml");
+    let rss = doc.querySelector("rss");
+    let channel = rss.querySelector("channel");
 
-  let names = ["offthemark", "garfield", "wizardofid", "andycapp", "glasbergen-cartoons"];
-  names.forEach((name) => updateCard(name, dt));
+    channel.querySelectorAll("item")
+        .forEach((item) => parseItem(comic_id, item));
 }
 
-async function onHashChange() {
-  let hash = window.location.hash.substring(1);
-  let dt = new Date(Date.now());
+async function loadFeeds() {
+    let comicIds = [
+        "garfield",
+        "wizardofid",
+        "andycapp",
+        "glasbergen-cartoons",
+        "offthemark",
+    ];
 
-  if (hash === "random") {
-    let start_time = new Date(2002, 0, 1).getTime();
-    let today_time = new Date().getTime();
-    let rand_time = randBetween(start_time, today_time);
-    dt = new Date(rand_time);
-  } else {
-    let parseable = /[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}/;
-    if (parseable.test(hash)) {
-      dt = new Date(Date.parse(hash));
+    await Promise.all(comicIds.map(parseComic));
+}
+
+
+async function setComicImage(img_hash, comic_id) {
+    let img = document.querySelector(`#${comic_id} img`);
+    let img_url = `https://featureassets.gocomics.com/assets/${img_hash}`;
+    img.src = img_url;
+}
+
+async function setCurrentPubdateTo(pubdate) {
+    let key = pubdate.key()
+    if (!library.has(key)) {
+        return;
     }
-  }
+    if (pubdate === currentPubdate) {
+        return;
+    }
+    currentPubdate = pubdate;
 
-  updatePage(dt);
+    document.getElementById("btn-first").disabled = (pubdate <= firstPubdate);
+    document.getElementById("btn-prev").disabled = (pubdate <= firstPubdate) || (lastPubdate < pubdate);
+    document.getElementById("btn-next").disabled = (pubdate < firstPubdate) || (lastPubdate <= pubdate);
+    document.getElementById("btn-last").disabled = (lastPubdate <= pubdate);
+
+    library.get(key).forEach(setComicImage);
+
+    let main = document.getElementsByTagName("main")[0];
+    main.classList.toggle("sunday", pubdate.getDay() === 0);
+
+    document.getElementById("datesig").textContent = pubdate.display();
+    document.title = `Cartoons of ${pubdate.display()}`;
+}
+
+async function changePubdateTo(which) {
+    let keys = Array.from(library.keys());
+    if (which === "first") {
+        let firstKey = keys.reduce((a, b) => { return (a < b) ? a : b; });
+        setCurrentPubdateTo(new Date(firstKey));
+    } else if (which === "prev") {
+        setCurrentPubdateTo(currentPubdate.prev());
+    } else if (which === "random") {
+        // never pick the current pubdate
+        keys = keys.filter(key => new Date(key) != currentPubdate);
+        let idx = Math.floor(Math.random() * keys.length);
+        let randomPubdate = new Date(keys[idx]);
+        setCurrentPubdateTo(randomPubdate);
+    } else if (which === "next") {
+        setCurrentPubdateTo(currentPubdate.next());
+    } else if (which === "last") {
+        let lastKey = keys.reduce((a, b) => { return (a < b) ? b : a; });
+        setCurrentPubdateTo(new Date(lastKey));
+    }
 }
 
 async function onKeyUp(evt) {
-  if (evt.key == "t") {
-    window.location.hash = "";
-    onHashChange();
-  } else if (evt.key == "p") {
-    window.location.hash = btnPrev.getAttribute("href");
-    onHashChange();
-  } else if (evt.key == "n") {
-    window.location.hash = btnNext.getAttribute("href");
-    onHashChange();
-  } else if (evt.key == "r") {
-    window.location.hash = "#random";
-    onHashChange();
-  }
+    if (evt.key == "a") {
+        changePubdateTo("first");
+    } else if (evt.key == "p") {
+        changePubdateTo("prev");
+    } else if (evt.key == "n") {
+        changePubdateTo("next");
+    } else if (evt.key == "r") {
+        changePubdateTo("random");
+    } else if (evt.key == "z") {
+        changePubdateTo("last");
+    }
 }
 
 window.onload = async function () {
-  window.addEventListener("hashchange", onHashChange);
-  window.addEventListener("keyup", (evt) => onKeyUp(evt));
-
-  onHashChange();
+    await loadFeeds();
+    changePubdateTo("last");
+    window.addEventListener("keyup", (evt) => onKeyUp(evt));
 };
