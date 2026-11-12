@@ -1,3 +1,11 @@
+let allComics = [
+    { id: "garfield", feed: "garfield", wxh: "900x250" },
+    { id: "wizardofid", feed: "wizardofid", wxh: "900x250" },
+    { id: "andycapp", feed: "andycapp", wxh: "900x250" },
+    { id: "glasbergen", feed: "glasbergen-cartoons", wxh: "400x400" },
+    { id: "offthemark", feed: "offthemark", wxh: "450x540" },
+];
+
 const parser = new DOMParser();
 let firstPubdate = null;
 let lastPubdate = null;
@@ -37,52 +45,44 @@ Date.prototype.display = function () {
 
 // #endregion Prototyping
 
-function addToLibrary(img_date, comic_id, img_hash) {
+function addToLibrary(img_date, comic, img_hash) {
     if (!library.has(img_date)) {
         library.set(img_date, new Map());
     }
     let pubdate = new Date(img_date);
     firstPubdate = (firstPubdate == null ? pubdate : (pubdate < firstPubdate) ? pubdate : firstPubdate);
     lastPubdate = (lastPubdate == null ? pubdate : (lastPubdate < pubdate) ? pubdate : lastPubdate);
-    library.get(img_date).set(comic_id, img_hash);
+    library.get(img_date).set(comic.id, img_hash);
 }
 
-function parseItem(comic_id, item) {
+function parseItem(comic, item) {
     let title = String(item.querySelector("title").textContent);
     let img_date = title.substring(title.length - 10, title.length);
     let description = String(item.querySelector("description").textContent);
     let re_groups = /assets\/([0-9a-f]+)/.exec(description);
     let img_hash = re_groups[1];
-    addToLibrary(img_date, comic_id, img_hash);
+    addToLibrary(img_date, comic, img_hash);
 }
 
-async function parseComic(comic_id) {
-    let feed_url = `https://comiccaster.xyz/rss/${comic_id}`;
+async function loadComic(comic) {
+    let feed_url = `https://comiccaster.xyz/rss/${comic.feed}`;
     let xml = await (await fetch(feed_url)).text();
     let doc = parser.parseFromString(xml, "text/xml");
     let rss = doc.querySelector("rss");
     let channel = rss.querySelector("channel");
 
     channel.querySelectorAll("item")
-        .forEach((item) => parseItem(comic_id, item));
+        .forEach((item) => parseItem(comic, item));
 }
 
-async function loadFeeds() {
-    let comicIds = [
-        "garfield",
-        "wizardofid",
-        "andycapp",
-        "glasbergen-cartoons",
-        "offthemark",
-    ];
-
-    await Promise.all(comicIds.map(parseComic));
-}
-
-
-async function setComicImage(img_hash, comic_id) {
-    let img = document.querySelector(`#${comic_id} img`);
-    let img_url = `https://featureassets.gocomics.com/assets/${img_hash}`;
+async function updateComicImage(comic, pubdate) {
+    let key = pubdate.key()
+    let img_hash = library.get(key).get(comic.id)
+    let img_url = `https://placehold.co/${comic.wxh}/444/ddd?text=:-(+Not+found`;
+    if (img_hash !== undefined) {
+        img_url = `https://featureassets.gocomics.com/assets/${img_hash}`;
+    }
+    let img = document.querySelector(`#${comic.id} img`);
     img.src = img_url;
 }
 
@@ -101,7 +101,7 @@ async function setCurrentPubdateTo(pubdate) {
     document.getElementById("btn-next").disabled = (pubdate < firstPubdate) || (lastPubdate <= pubdate);
     document.getElementById("btn-last").disabled = (lastPubdate <= pubdate);
 
-    library.get(key).forEach(setComicImage);
+    allComics.map((comic) => updateComicImage(comic, pubdate));
 
     let main = document.getElementsByTagName("main")[0];
     main.classList.toggle("sunday", pubdate.getDay() === 0);
@@ -146,7 +146,8 @@ async function onKeyUp(evt) {
 }
 
 window.onload = async function () {
-    await loadFeeds();
+    await Promise.all(allComics.map(loadComic));
+
     changePubdateTo("last");
     window.addEventListener("keyup", (evt) => onKeyUp(evt));
 };
